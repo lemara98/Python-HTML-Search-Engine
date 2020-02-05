@@ -6,6 +6,11 @@ class ParseResult:
         self.links = links
         self.words = words
         self.name = name
+        self.googleRang = 0
+        self.mapForH = {}  # this is map/dict for matrixH (google rank)
+        for link in self.links:
+            self.mapForH[os.path.basename(link)] = 0  # inicijalizujemo recnik
+        self.rang = 0
 
 
 def parseFiles(abs_path, parser, parsiraniFilovi):
@@ -15,7 +20,7 @@ def parseFiles(abs_path, parser, parsiraniFilovi):
 
         if os.path.isdir(directory_path):  #ako je datoteka onda se rekurzivno poziva funkcija
             parseFiles(directory_path,parser,parsiraniFilovi)
-        if filename.endswith("html"):
+        elif filename.endswith("html"):
             s = tuple(parser.parse(directory_path))
             pp = ParseResult(s[0], s[-1], filename)
             pp.absolutePath = directory_path    #absolutna putanja do fajla

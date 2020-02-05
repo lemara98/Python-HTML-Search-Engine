@@ -60,3 +60,9 @@ class GlobalTrie:
                             pCurrentNode.documents.append(newDoc)
                         else:
                             pCurrentNode.documents[index].numberOfWord += 1     #povecavamo broj reci u tom dokumentu
+
+    def printTrie(self, node):
+        print(node.data)
+        for child in node.children:
+            self.printTrie(child)
+            print("||")
