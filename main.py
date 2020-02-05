@@ -4,7 +4,8 @@ from parsingFiles import parseFiles
 from TrieStruct import GlobalTrie
 import parsingQueries
 from time import time
-
+from rangFiles import rangirajFajlovePoGooglu
+from rangFiles import RangFiles, sortFilesByRang
 def menu():
     print("1. parse files")
     print("2. enter the query")
@@ -38,6 +39,7 @@ def main():
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
             abs_path = os.path.abspath(os.path.dirname(rel_path))
             parseFiles(abs_path, p, parsiraniFajlovi)
+            rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
             t0 = time()
             globalTrie = GlobalTrie(parsiraniFajlovi)   #ovde se pravi globalno drvo
             tn = time()
@@ -76,7 +78,8 @@ def main():
                     print("You didn't choose correctly, please choose again")
 
         elif userInput == "3":
-            pass
+            RangFiles(searchedFiles, queryWords, globalTrie)
+            sortedFiles = sortFilesByRang(searchedFiles)
 
         elif userInput == "4":
             badEntry = True
@@ -89,6 +92,8 @@ def main():
                         print(file.file.name, file.file.googleRang)
                     badEntry = False
                 elif searchInput == "2":
+                    for file in sortedFiles:
+                        print(file.file.name, file.file.rang)
                     badEntry = False
 
                 else:
