@@ -6,15 +6,16 @@ import parsingQueries
 from time import time
 from rangFiles import rangirajFajlovePoGooglu
 from rangFiles import RangFiles, sortFilesByRang
+from pagination import PaginatePages
 def menu():
-    print("1. parse files")
-    print("2. enter the query")
-    print("3. rang files")
-    print("4. print result")
-    print("5. pagination")
+    print("1. Parse files")
+    print("2. Enter the query")
+    print("3. Rang files")
+    print("4. Print result")
+    print("5. Pagination")
     print("0. Exit")
     print()
-    userInput = input("choose option")
+    userInput = input("Choose option: ")
     return userInput
 
 
@@ -100,7 +101,9 @@ def main():
                     print("You didn't choose correctly, please choose again")
 
         elif userInput == "5":
-            pass        #pagination
+            N = input("Number of files on one page: ")
+            PaginatePages(searchedFiles, N) # Mozda bismo trebali rangirane fajlove!
+
         elif userInput == "0":
             break
 
