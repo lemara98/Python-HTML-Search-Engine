@@ -7,12 +7,15 @@ from time import time
 from rangFiles import rangirajFajlovePoGooglu
 from rangFiles import RangFiles, sortFilesByRang
 from pagination import PaginatePages
+from GraphStruct import GraphResult
+from parsingQueries import machingWord
 def menu():
     print("1. Parse files")
     print("2. Enter the query")
     print("3. Rang files")
     print("4. Print result")
     print("5. Pagination")
+    print("6. Graf rezultata")
     print("0. Exit")
     print()
     userInput = input("Choose option: ")
@@ -21,6 +24,7 @@ def menu():
 
 def main():
     p = Parser()
+    G = GraphResult()
     abs_path = os.path.abspath(os.getcwd())  #inicijalizujemo path na crnt working dir
     parsiraniFajlovi = []  # ovde cuvamo isparsirane fajlove
     searchedFiles = []
@@ -39,7 +43,8 @@ def main():
                 continue
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
             abs_path = os.path.abspath(os.path.dirname(rel_path))
-            parseFiles(abs_path, p, parsiraniFajlovi)
+            parseFiles(abs_path, p, parsiraniFajlovi, G)
+            #G.prikazi_graficki_rezultat()
             rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
             t0 = time()
             globalTrie = GlobalTrie(parsiraniFajlovi)   #ovde se pravi globalno drvo
@@ -94,15 +99,33 @@ def main():
                     badEntry = False
                 elif searchInput == "2":
                     for file in sortedFiles:
-                        print(file.file.name, file.file.rang)
+                        print(file.file.name, file.file.rang, file.numberOfWord)
                     badEntry = False
 
                 else:
                     print("You didn't choose correctly, please choose again")
 
         elif userInput == "5":
-            N = input("Number of files on one page: ")
+            N = input("Number of files on one page: ")  # NE radi dobro za poslednju stranicu!!!!!!!!!!!
             PaginatePages(searchedFiles, N) # Mozda bismo trebali rangirane fajlove!
+
+        elif userInput == "6":
+            G1 = GraphResult()
+            fileNames = []      # ime fajlova koji sadrze trazenu rec
+            for word in queryWords:
+                suc, docList = machingWord (word, globalTrie)
+                for file in docList:
+                    fileNames.append(file.file.name)    #stavlja imena fajlova u listu
+
+
+            namesForGraph = []
+            for file in sortedFiles:
+                linksForGraph = []  # lista linkova za graf koji pokazuju na fajlove koji sadrze trazenu rec ->fileNames
+                for link in file.file.links:
+                    if os.path.basename(link) in fileNames:
+                        linksForGraph.append(link)
+                G1.dodajCvorUGraf(file.file.name, linksForGraph, file.file.rang)
+            G1.prikazi_graficki_rezultat()
 
         elif userInput == "0":
             break

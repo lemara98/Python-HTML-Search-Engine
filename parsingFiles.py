@@ -1,5 +1,6 @@
 
 import os
+from GraphStruct import GraphResult
 
 class ParseResult:
     def __init__(self, links, words, name):
@@ -13,13 +14,13 @@ class ParseResult:
         self.rang = 0
 
 
-def parseFiles(abs_path, parser, parsiraniFilovi):
+def parseFiles(abs_path, parser, parsiraniFilovi, G):
     for filename in os.listdir(abs_path):
         print(filename)
         directory_path = os.path.join(abs_path, filename)
 
         if os.path.isdir(directory_path):  #ako je datoteka onda se rekurzivno poziva funkcija
-            parseFiles(directory_path,parser,parsiraniFilovi)
+            parseFiles(directory_path,parser,parsiraniFilovi, G)
         elif filename.endswith("html"):
             s = tuple(parser.parse(directory_path))
             pp = ParseResult(s[0], s[-1], filename)
