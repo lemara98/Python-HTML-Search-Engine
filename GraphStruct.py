@@ -19,6 +19,7 @@ class GraphResult:
             self.node_colors[i] = (random (), random (), random ()) # Boja u mapi
 
         for i in self.graf.nodes:
+            print(i, "aaaaaaaaaa")
             self.node_sizes.append (50000000 / len (self.graf.nodes) * self.node_rang[i])         # Velicina cvora
 
         for i, j in self.graf.edges:
@@ -37,7 +38,10 @@ class GraphResult:
     def dodajCvorUGraf(self, filename, listaPokazivacaCvora, rangCvora):
         self.graf.add_node(os.path.basename(filename))
         s = []
-        self.node_rang[filename] = rangCvora
+        print(os.path.basename(filename))
+        self.node_rang[os.path.basename(filename)] = rangCvora
         for i in listaPokazivacaCvora:
             s.append((filename, os.path.basename(i)))
-            self.graf.add_edges_from(s)
+            if i not in self.graf.nodes:
+                self.node_rang[os.path.basename(i)] = 0
+        self.graf.add_edges_from(s)

@@ -87,13 +87,15 @@ def simpleSearch(words, globalTrie):
         suc, docList = machingWord(word, globalTrie)
         if suc:     #rec je nadjena
             for file in docList:
-                if file not in searchedFiles:
+                nalazi = False
+                for f in searchedFiles:
+                    if file.file.name == f.file.name:
+                        f.numberOfWord += file.numberOfWord
+                        nalazi = True
+                        break
+                if not nalazi:
                     searchedFiles.append(file)
-                else:
-                    for f in searchedFiles:
-                        if f.name == file.name:
-                            f.numberOfWord += file.numberOfWord     #ovo mi postaje ukupan broj svih reci koje sadrzi fajl, treba mi zbog ranga
-                            break
+
     return searchedFiles
 
 def logicalSearch(words, globalTrie):
@@ -108,19 +110,34 @@ def logicalSearch(words, globalTrie):
 
     if logicalOpp == "AND":
         for file in docList1:
-            if file in docList2:
-                searchedFiles.append(file)      #radimo presek skupova, ako se nalazi u oba, dodaj fajl
+            for f in docList2:
+                if file.file.name == f.file.name:
+                    print(file.file.name, " ", file.numberOfWord, " ", f.numberOfWord)
+                    file.numberOfWord += f.numberOfWord
+                    searchedFiles.append(file)
+                    break
+
     elif logicalOpp == "OR":
         for file in docList1:
-            if file not in searchedFiles:
-                searchedFiles.append(file)      #ako se pojavljuje u bilo kom od skupova dodaj ga, al nemoj dvaput da ga dodas
+            searchedFiles.append(file) # da li je file referenca (orriginal)
         for file in docList2:
-            if file not in searchedFiles:
+            nalazi = False
+            for f in searchedFiles:
+                if file.file.name == f.file.name:
+                    f.numberOfWord += file.numberOfWord
+                    nalazi = True
+                    break
+            if not nalazi:
                 searchedFiles.append(file)
 
     elif logicalOpp == "NOT":
         for file in docList1:
-            if file not in docList2:
+            nalazi = False
+            for f in docList2:
+                if file.file.name == f.file.name:
+                    nalazi = True
+                    break
+            if not nalazi:
                 searchedFiles.append(file)      #ako se pojavljuje u prvom skupu, ne u drugom, dodaj ga
 
     return searchedFiles

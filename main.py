@@ -34,6 +34,7 @@ def main():
     queryWords = None
     queryInput = 0
     searchInput = 0
+    searchQueryChoosen = 0
     while userInput != 0:
         userInput = menu()
 
@@ -67,18 +68,23 @@ def main():
                 print("choose option")
                 queryInput = input()
                 if queryInput == "1":
+                    searchQueryChoosen = 1
                     query = input("Enter query: ")
                     words = parsingQueries.simpleQuery(query)
                     queryWords = words
-                    searchedFiles = parsingQueries.simpleSearch(words, globalTrie)
+                    if words is not None:
+                        searchedFiles = parsingQueries.simpleSearch(words, globalTrie)
                     badEntry = False
                 elif queryInput == "2":
+                    searchQueryChoosen = 2
                     query = input("Enter query: ")
                     words = parsingQueries.logicalQuery(query)
                     queryWords = words
-                    searchedFiles = parsingQueries.logicalSearch(words, globalTrie)
+                    if words is not None:
+                        searchedFiles = parsingQueries.logicalSearch(words, globalTrie)
                     badEntry = False
                 elif queryInput == "3":
+                    searchQueryChoosen = 3
                     badEntry = False
                 else:
                     print("You didn't choose correctly, please choose again")
@@ -112,13 +118,21 @@ def main():
         elif userInput == "6":
             G1 = GraphResult()
             fileNames = []      # ime fajlova koji sadrze trazenu rec
-            for word in queryWords:
-                suc, docList = machingWord (word, globalTrie)
-                for file in docList:
-                    fileNames.append(file.file.name)    #stavlja imena fajlova u listu
+            if searchQueryChoosen == 1:
+                for word in queryWords: #google, OR, Google
+                    suc, docList = machingWord (word, globalTrie)
+                    for file in docList:
+                        fileNames.append(file.file.name)    #stavlja imena fajlova u listu
+            elif searchQueryChoosen == 2:
+                suc1,docList1 = machingWord(queryWords[0], globalTrie)
+                suc2,docList2 = machingWord(queryWords[-1], globalTrie)
+                for file in docList1:
+                    fileNames.append(file.file.name)
+                for file in docList2:
+                    fileNames.append(file.file.name)
+            elif searchQueryChoosen == 3:
+                pass        #za komplex query
 
-
-            namesForGraph = []
             for file in sortedFiles:
                 linksForGraph = []  # lista linkova za graf koji pokazuju na fajlove koji sadrze trazenu rec ->fileNames
                 for link in file.file.links:
