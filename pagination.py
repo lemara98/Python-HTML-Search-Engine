@@ -20,7 +20,7 @@ def PaginatePages(searchedFiles, N):
                 if end > p.num_pages:
                     start = start - (end - p.num_pages)
                     end = p.num_pages       #sada treba prikazati vise stranica pre ove, posto ima mesta
-        for page in range(start, end):
+        for page in range(start, end+1):
             if page == currentPage.number:
                 CRED = '\033[91m'
                 CEND = '\033[0m'
@@ -28,7 +28,6 @@ def PaginatePages(searchedFiles, N):
             else:
                 print(page, end=" ")
         n = False
-
         if currentPage.has_next():      #zeza kod poslenje stranice, pogledati sta je frka
             n = True
             print("Next")
@@ -38,14 +37,14 @@ def PaginatePages(searchedFiles, N):
         print("Press 0 to Exit")
 
 
-        option = input("choose option")
+        option = input("choose option: ")
 
         if option == "0":
             break
         if pr == True:
             if option == "Prev":
                 currentPage = p.page(currentPage.previous_page_number())
-        for i in range(1, p.num_pages):
+        for i in range(1, p.num_pages+1):
             if option == str(i):
                 currentPage = p.page(i)
                 break

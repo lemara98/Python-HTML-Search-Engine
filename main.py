@@ -45,18 +45,17 @@ def main():
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
             t0 = time ()
             abs_path = os.path.join(abs_path,rel_path)
+            if not os.path.exists(abs_path):
+                print("Ne postoji takav direktorijum!")
+                continue
             parseFiles(abs_path, "", p, parsiraniFajlovi)
             t1 = time()
             #G.prikazi_graficki_rezultat()
-
             rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
             t2 = time()
             globalTrie = GlobalTrie(parsiraniFajlovi)
             t3 = time()
 
-
-            for file in parsiraniFajlovi:
-                print(file.name)
             print("///////////trie////////////")
             globalTrie.printTrie(globalTrie.root)
             tn = time ()
