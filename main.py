@@ -43,19 +43,28 @@ def main():
                 print("Files already parsed")
                 continue
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
+            t0 = time ()
             abs_path = os.path.join(abs_path,rel_path)
-            parseFiles(abs_path, p, parsiraniFajlovi)
+            parseFiles(abs_path, "", p, parsiraniFajlovi)
+            t1 = time()
             #G.prikazi_graficki_rezultat()
             rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
-            t0 = time()
+            t2 = time()
+
             globalTrie = GlobalTrie(parsiraniFajlovi)   #ovde se pravi globalno drvo
-            tn = time()
-            print(tn-t0)
+            t3 = time()
+
             print("///////////////////////////////////////")
             for file in parsiraniFajlovi:
                 print(file.name)
             print("///////////trie////////////")
             globalTrie.printTrie(globalTrie.root)
+            tn = time ()
+            print("Vreme parsiranja: ", t1 - t0)
+            print("Vreme za gugl rangiranje: ", t2 - t1)
+            print("Vreme za pravljenje stabla: ", t3 - t2)
+            print("Vreme za stampanje drveta: ", tn - t3)
+            print ("Ukupno vreme potrebno za parsiranje i kreiranej stabla: ", tn - t0)
 
 
         elif userInput == "2":
@@ -104,8 +113,10 @@ def main():
                         print(file.file.name, file.file.googleRang)
                     badEntry = False
                 elif searchInput == "2":
+                    l = len(sortedFiles)
                     for file in sortedFiles:
-                        print(file.file.name, file.file.rang, file.numberOfWord)
+                        print(l, ")", file.file.name, file.file.rang, file.numberOfWord)
+                        l-=1
                     badEntry = False
 
                 else:
@@ -136,10 +147,11 @@ def main():
             for file in sortedFiles:
                 linksForGraph = []  # lista linkova za graf koji pokazuju na fajlove koji sadrze trazenu rec ->fileNames
                 for link in file.file.links:
-                    if os.path.basename(link) in fileNames:
+                    if link in fileNames:
                         linksForGraph.append(link)
                 G1.dodajCvorUGraf(file.file.name, linksForGraph, file.file.rang)
             G1.prikazi_graficki_rezultat()
+            # PROVERITI DA LI GRAF SA LINKOVIMA VALJA U ODNOSU NA TESTOVE PRE UNETIH SADASNJIH IZMENA!!!!
 
         elif userInput == "0":
             break
