@@ -48,13 +48,13 @@ def main():
             parseFiles(abs_path, "", p, parsiraniFajlovi)
             t1 = time()
             #G.prikazi_graficki_rezultat()
+
             rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
             t2 = time()
-
-            globalTrie = GlobalTrie(parsiraniFajlovi)   #ovde se pravi globalno drvo
+            globalTrie = GlobalTrie(parsiraniFajlovi)
             t3 = time()
 
-            print("///////////////////////////////////////")
+
             for file in parsiraniFajlovi:
                 print(file.name)
             print("///////////trie////////////")
@@ -65,6 +65,7 @@ def main():
             print("Vreme za pravljenje stabla: ", t3 - t2)
             print("Vreme za stampanje drveta: ", tn - t3)
             print ("Ukupno vreme potrebno za parsiranje i kreiranej stabla: ", tn - t0)
+            print("broj parsiranih fajlova: ", len(parsiraniFajlovi))
 
 
         elif userInput == "2":
@@ -99,7 +100,7 @@ def main():
                     print("You didn't choose correctly, please choose again")
 
         elif userInput == "3":
-            RangFiles(searchedFiles, queryWords, globalTrie)
+            RangFiles(searchedFiles, queryWords, globalTrie, parsiraniFajlovi)
             sortedFiles = sortFilesByRang(searchedFiles)
 
         elif userInput == "4":

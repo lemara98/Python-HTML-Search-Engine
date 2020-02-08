@@ -26,7 +26,7 @@ class GlobalTrieNode:
 class GlobalTrie:
     def __init__(self, parsiraniFajlovi):
         self.root = GlobalTrieNode("root")
-        pCurrentNode = None
+
         for file in parsiraniFajlovi:
             for word in file.words:
                 pCurrentNode = self.root
@@ -46,11 +46,11 @@ class GlobalTrie:
                             pCurrentNode.addChild(newNode)
                             pCurrentNode = newNode
 
-                    #ako smo dosli do kraja reci, sada treba upisati dokument(file) koji sadrzi tu rec u listu fajlova u tom cvoru, takodje broj reci u tom fajlu
+                    # ako smo dosli do kraja reci, sada treba upisati dokument(file) koji sadrzi tu rec u listu fajlova u tom cvoru, takodje broj reci u tom fajlu
                     postoji = False
                     if i == (len(word) - 1):
                         index = 0
-                        for j, doc in enumerate(pCurrentNode.documents, start = 0):
+                        for j, doc in enumerate(pCurrentNode.documents, start=0):
                             if doc.file.name == file.name:
                                 postoji = True
                                 index = j
@@ -59,7 +59,7 @@ class GlobalTrie:
                             newDoc = GlobalDocumentList(file)
                             pCurrentNode.documents.append(newDoc)
                         else:
-                            pCurrentNode.documents[index].numberOfWord += 1     #povecavamo broj reci u tom dokumentu
+                            pCurrentNode.documents[index].numberOfWord += 1  # povecavamo broj reci u tom dokumentu
 
     def printTrie(self, node):
         print(node.data)

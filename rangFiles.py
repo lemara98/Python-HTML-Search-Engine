@@ -2,6 +2,7 @@ import numpy as np
 import os
 from parsingQueries import machingWord
 
+
 d = 0.85    #dumping faktor
 
 def findMatrixH(parsiraniFajlovi):
@@ -9,20 +10,23 @@ def findMatrixH(parsiraniFajlovi):
     H = H * 0   #svi elementi su mi 0 na pocetku
     for i, file in enumerate(parsiraniFajlovi, start = 0):
         for link in file.links:
-            file.mapForH[os.path.basename(link)] += 1       #broj linkova u svakom fajlu prema ovom fajlu
+            file.mapForH[link] += 1       #broj linkova u svakom fajlu prema ovom fajlu
         duzinaMape = 0
         for key in file.mapForH:
             duzinaMape += 1
-        # print("Duzina mape: %s" %duzinaMape)
-        # print("Broj Fajlova: %s" %len(parsiraniFajlovi))
         for j, key in enumerate(file.mapForH, start = 0):
             H[j, i] = file.mapForH[key]/len(file.links)     #punimo redove od matrice
 
-    print(H)
+        for key in file.mapForH:
+            file.mapaPokazivacaNaFajl[key] = []
+        for i, key in enumerate(file.mapForH, start = 0):
+            for j, key2 in enumerate(file.mapForH, start=0):
+                if H[i,j] != 0:
+                    file.mapaPokazivacaNaFajl[key].append(key2)     #dodajem ime u listu
+
     s = 0
     for i in range(len(H)):
         s += H[i,1]
-    print(s)
     return H    #napravili smo matricu
 
 def googleRankForFiles(H):
@@ -31,7 +35,6 @@ def googleRankForFiles(H):
     v /= n
     v = ((1-d)*v)
     v = np.transpose(v)  # pravimo vektor kolone
-    print("Ovoooo je vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ", v)
 
     return np.linalg.solve((np.eye(len(H))-d*H),v)     #hopefuly it works , treba da dobijemo vektor sa rangovima fajlova
 
@@ -42,11 +45,11 @@ def rangirajFajlovePoGooglu(parsiraniFajlovi):
         f.googleRang = x[i]     #setujemo googlom rang
 
 
-def RangFiles(searchedFiles, words, globalTrie):
+def RangFiles(searchedFiles, words, globalTrie, parsiraniFajlovi):
     for file in searchedFiles:
-        addRangToFile(file, words, globalTrie)
+        addRangToFile(file, words, globalTrie, parsiraniFajlovi)
 
-def addRangToFile(file, words, globalTrie):
+def addRangToFile(file, words, globalTrie, parsiraniFajlovi):
     brojReciUFajlu = file.numberOfWord  #1. stavka ranga
 
     vrednostReciUDrugimFajlovima = 0
@@ -54,10 +57,19 @@ def addRangToFile(file, words, globalTrie):
         suc, docList = machingWord(word, globalTrie)
         if suc:
             for doc in docList:
-                if os.path.abspath(file.file.name) in doc.file.links:
-                     vrednostReciUDrugimFajlovima += doc.file.googleRang * doc.numberOfWord     #3. stavka ranga
+                if file.file.name in doc.file.links:
+                     vrednostReciUDrugimFajlovima += doc.file.googleRang * doc.numberOfWord * 10     #3. stavka ranga
 
-    file.file.rang = brojReciUFajlu * file.file.googleRang*3 + vrednostReciUDrugimFajlovima     #dodeljujemo rang fajlu
+    uticajPokazivaca = 0
+    br = 0
+
+    for fajl in file.file.mapaPokazivacaNaFajl:
+        br += 1
+        f = returnFileByName(parsiraniFajlovi, fajl)
+
+        uticajPokazivaca += f.googleRang *10
+
+    file.file.rang = brojReciUFajlu + uticajPokazivaca + vrednostReciUDrugimFajlovima     #dodeljujemo rang fajlu
 
 
 def sortFilesByRang(pretrazeniFajlovi):  #algoritam za sortiranje po rangu
@@ -69,3 +81,10 @@ def sortFilesByRang(pretrazeniFajlovi):  #algoritam za sortiranje po rangu
             if sortedFiles[j].file.rang > sortedFiles[i].file.rang:
                 sortedFiles[i], sortedFiles[j] = sortedFiles[j], sortedFiles[i] #ako je drugi veci menjamo mesta
     return sortedFiles
+
+def returnFileByName(parsiraniFajlovi, fileName):
+    for file in parsiraniFajlovi:
+        if file.name == fileName:
+            return file
+    print("File not found")
+    return None
