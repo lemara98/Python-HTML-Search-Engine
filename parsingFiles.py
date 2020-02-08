@@ -14,15 +14,20 @@ class ParseResult:
         self.rang = 0
 
 
-def parseFiles(abs_path, parser, parsiraniFilovi, G):
+def parseFiles(abs_path, parser, parsiraniFilovi):
     for filename in os.listdir(abs_path):
-        print(filename)
+        print(len(os.listdir(abs_path)))
+        if len(os.listdir(abs_path)) == 1:
+            director = os.path.join(abs_path,filename)
+            if os.path.isdir(director) and len(parsiraniFilovi) == 0 :
+                abs_path = director
+                parseFiles(abs_path,parser,parsiraniFilovi)
+                break
+        print(os.path.relpath(filename, abs_path))
         directory_path = os.path.join(abs_path, filename)
-
         if os.path.isdir(directory_path):  #ako je datoteka onda se rekurzivno poziva funkcija
-            parseFiles(directory_path,parser,parsiraniFilovi, G)
+            parseFiles(directory_path,parser,parsiraniFilovi)
         elif filename.endswith("html"):
             s = tuple(parser.parse(directory_path))
-            pp = ParseResult(s[0], s[-1], filename)
-            pp.absolutePath = directory_path    #absolutna putanja do fajla
+            pp = ParseResult(s[0], s[-1], directory_path)
             parsiraniFilovi.append(pp)

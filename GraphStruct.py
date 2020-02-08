@@ -20,7 +20,7 @@ class GraphResult:
 
         for i in self.graf.nodes:
             print(i, "aaaaaaaaaa")
-            self.node_sizes.append (50000000 / len (self.graf.nodes) * self.node_rang[i])         # Velicina cvora
+            self.node_sizes.append (500000 / len (self.graf.nodes) * self.node_rang[i])         # Velicina cvora
 
         for i, j in self.graf.edges:
             self.edge_colors.append (self.node_colors[i])   # Boja veza u listi
@@ -36,12 +36,11 @@ class GraphResult:
         plot.show ()
 
     def dodajCvorUGraf(self, filename, listaPokazivacaCvora, rangCvora):
-        self.graf.add_node(os.path.basename(filename))
+        self.graf.add_node(filename)
         s = []
-        print(os.path.basename(filename))
-        self.node_rang[os.path.basename(filename)] = rangCvora
+        self.node_rang[filename] = rangCvora
         for i in listaPokazivacaCvora:
-            s.append((filename, os.path.basename(i)))
+            s.append((filename, i))
             if i not in self.graf.nodes:
-                self.node_rang[os.path.basename(i)] = 0
+                self.node_rang[i] = 0
         self.graf.add_edges_from(s)

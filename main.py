@@ -43,8 +43,8 @@ def main():
                 print("Files already parsed")
                 continue
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
-            abs_path = os.path.abspath(os.path.dirname(rel_path))
-            parseFiles(abs_path, p, parsiraniFajlovi, G)
+            abs_path = os.path.join(abs_path,rel_path)
+            parseFiles(abs_path, p, parsiraniFajlovi)
             #G.prikazi_graficki_rezultat()
             rangirajFajlovePoGooglu(parsiraniFajlovi)   #dodeljujemo googlov rang fajlovima
             t0 = time()
