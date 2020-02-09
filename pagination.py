@@ -4,8 +4,12 @@ def PaginatePages(searchedFiles, N):
     p = Paginator(searchedFiles, N)
     currentPage = p.page(1)
     while True:
+        l = 1
+        print("************************")
         for file in currentPage.object_list:
-            print(file.file.name)
+            print(l, ") ", file.file.name)
+            l+=1
+        print ("************************")
         pr = False
         if currentPage.has_previous():
             pr = True
@@ -31,7 +35,7 @@ def PaginatePages(searchedFiles, N):
         if currentPage.has_next():      #zeza kod poslenje stranice, pogledati sta je frka
             n = True
             print("Next")
-
+        print('')
         print("Press N to change number of files per page ")
 
         print("Press 0 to Exit")

@@ -1,3 +1,5 @@
+from locale import atoi
+
 from parser import Parser
 import os
 from parsingFiles import parseFiles
@@ -36,12 +38,14 @@ def main():
     queryWords = None
     queryInput = 0
     searchInput = 0
+    rangirano = False
     searchQueryChoosen = 0
     while userInput != 0:
         userInput = menu()
 
         if userInput == "1":
             parsiraniFajlovi = []
+            rangirano = False
             abs_path = os.path.abspath (os.getcwd ())  # inicijalizujemo path na crnt working dir
             # if len(parsiraniFajlovi) != 0:
             #     print("Files already parsed")
@@ -100,6 +104,7 @@ def main():
                     if words is not None:
                         searchedFiles = parsingQueries.simpleSearch(words, globalTrie)
                     badEntry = False
+                    rangirano = False
                     print ("--- Uspesno pretrazene reci ---")
                 elif queryInput == "2":
                     searchQueryChoosen = 2
@@ -109,6 +114,7 @@ def main():
                     if words is not None:
                         searchedFiles = parsingQueries.logicalSearch(words, globalTrie)
                     badEntry = False
+                    rangirano = False
                 elif queryInput == "3":
                     query = input("Enter query: ")
                     myTree = parsingQueries.complexQuery(query)
@@ -117,6 +123,7 @@ def main():
                  #  words = parsingQueries.complexQuery()
                     searchQueryChoosen = 3
                     badEntry = False
+                    rangirano = False
                     print("--- Uspesno pretrazen kompleksan upit ---") # u kompleks query!!!!!
                 elif queryInput == '0':
                     break
@@ -127,15 +134,24 @@ def main():
         elif userInput == "3":
             if len(parsiraniFajlovi) == 0:
                 print("Prvo parsirati fajlove")
+                continue
             if len (searchedFiles) == 0:
                 print("Skup pretrazenih fajlova je prazan!")
                 print("Uraditi pretragu")
                 continue
             RangFiles(searchedFiles, queryWords, globalTrie, parsiraniFajlovi)
             sortedFiles = sortFilesByRang(searchedFiles)
+            rangirano = True
             print("--- Uspesno rangirani fajlovi ---")
 
         elif userInput == "4":
+            if len(parsiraniFajlovi) == 0:
+                print("Prvo parsirati fajlove")
+                continue
+            if len (searchedFiles) == 0:
+                print("Skup pretrazenih fajlova je prazan!")
+                print("Uraditi pretragu")
+                continue
             badEntry = True
             while badEntry:
                 print("1. Basic print")
@@ -159,12 +175,38 @@ def main():
             print("--- Uspesno izvrsen ispis ---")
 
         elif userInput == "5":
-            print("Za izlaz iz opcije - bilo sta nelogicno")
-            N = input("Number of files on one page: ")  # NE radi dobro za poslednju stranicu!!!!!!!!!!!
-            PaginatePages(searchedFiles, N) # Mozda bismo trebali rangirane fajlove!
+            if len (parsiraniFajlovi) == 0:
+                print ("Prvo parsirati fajlove")
+                continue
+            if len (searchedFiles) == 0:
+                print ("Skup pretrazenih fajlova je prazan!")
+                print ("Uraditi pretragu")
+                continue
+            while True:
+                print("Za izlaz iz opcije - bilo sta nelogicno")
+                N = input("Number of files on one page: ")  # NE radi dobro za poslednju stranicu!!!!!!!!!!!
+                if N.isdigit():
+                    N = atoi(N)
+                    if N > 0:
+                        PaginatePages(searchedFiles, N) # Mozda bismo trebali rangirane fajlove!
+                        break
+                    else:
+                        break
+                else:
+                    break
 
 
         elif userInput == "6":
+            if len(parsiraniFajlovi) == 0:
+                print("Prvo parsirati fajlove")
+                continue
+            if len (searchedFiles) == 0:
+                print("Skup pretrazenih fajlova je prazan!")
+                print("Uraditi pretragu")
+                continue
+            if rangirano == False:
+                print("Rangirajte da biste videli graf")
+                continue
             G1 = GraphResult()
             fileNames = []      # ime fajlova koji sadrze trazenu rec
             if searchQueryChoosen == 1:
