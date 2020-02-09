@@ -14,6 +14,7 @@ def logicalQuery(userInput):
     if (subStrings[0] in LogicalOpps) or (subStrings[-1] in LogicalOpps) or (subStrings[1] not in LogicalOpps):
         print("Error, not a good format")
         return None
+    print ("--- Uspesno pretrazen upit ---")
     return subStrings       #ako je provera prosla, znaci da je dobar format
 
 def complexQuery(queryInput):    #this should return tree
@@ -96,9 +97,6 @@ def simpleSearch(words, globalTrie):
                 if not nalazi:
                     searchedFiles.append(docMap[key])
 
-    print(len(searchedFiles))
-    for i in searchedFiles:
-        print(i)
     return searchedFiles
 
 def logicalSearch(words, globalTrie):
@@ -114,34 +112,33 @@ def logicalSearch(words, globalTrie):
     if logicalOpp == "AND":
         for file in docList1:
             for f in docList2:
-                if file.file.name == f.file.name:
-                    print(file.file.name, " ", file.numberOfWord, " ", f.numberOfWord)
-                    file.numberOfWord += f.numberOfWord
-                    searchedFiles.append(file)
+                if docList1[file].file.name == docList2[f].file.name:
+                    docList1[file].numberOfWord += docList2[f].numberOfWord
+                    searchedFiles.append(docList1[file])
                     break
 
     elif logicalOpp == "OR":
         for file in docList1:
-            searchedFiles.append(file) # da li je file referenca (orriginal)
+            searchedFiles.append(docList1[file]) # da li je file referenca (orriginal)
         for file in docList2:
             nalazi = False
             for f in searchedFiles:
-                if file.file.name == f.file.name:
-                    f.numberOfWord += file.numberOfWord
+                if docList2[file].file.name == f.file.name:
+                    f.numberOfWord += docList2[file].numberOfWord
                     nalazi = True
                     break
             if not nalazi:
-                searchedFiles.append(file)
+                searchedFiles.append(docList2[file])
 
     elif logicalOpp == "NOT":
         for file in docList1:
             nalazi = False
             for f in docList2:
-                if file.file.name == f.file.name:
+                if docList1[file].file.name == docList2[f].file.name:
                     nalazi = True
                     break
             if not nalazi:
-                searchedFiles.append(file)      #ako se pojavljuje u prvom skupu, ne u drugom, dodaj ga
+                searchedFiles.append(docList1[file])      #ako se pojavljuje u prvom skupu, ne u drugom, dodaj ga
 
     return searchedFiles
 
