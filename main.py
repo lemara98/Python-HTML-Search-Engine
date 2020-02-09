@@ -25,7 +25,6 @@ def menu():
 def main():
     p = Parser()
     G = GraphResult()
-    abs_path = os.path.abspath(os.getcwd())  #inicijalizujemo path na crnt working dir
     parsiraniFajlovi = []  # ovde cuvamo isparsirane fajlove
     searchedFiles = []
     sortedFiles = []
@@ -39,9 +38,11 @@ def main():
         userInput = menu()
 
         if userInput == "1":
-            if len(parsiraniFajlovi) != 0:
-                print("Files already parsed")
-                continue
+            parsiraniFajlovi = []
+            abs_path = os.path.abspath (os.getcwd ())  # inicijalizujemo path na crnt working dir
+            # if len(parsiraniFajlovi) != 0:
+            #     print("Files already parsed")
+            #     continue
             rel_path = input("Izaberite root direktorijum, relativnu putanju od 'Drudi projektni zadatak': ")
             t0 = time ()
             abs_path = os.path.join(abs_path,rel_path)
@@ -57,7 +58,7 @@ def main():
             t3 = time()
 
             print("///////////trie////////////")
-            globalTrie.printTrie(globalTrie.root)
+            #globalTrie.printTrie(globalTrie.root)
             tn = time ()
             print("Vreme parsiranja: ", t1 - t0)
             print("Vreme za gugl rangiranje: ", t2 - t1)
@@ -99,6 +100,8 @@ def main():
                     print("You didn't choose correctly, please choose again")
 
         elif userInput == "3":
+            for i  in searchedFiles:
+                print(i)
             RangFiles(searchedFiles, queryWords, globalTrie, parsiraniFajlovi)
             sortedFiles = sortFilesByRang(searchedFiles)
 
@@ -133,14 +136,14 @@ def main():
                 for word in queryWords: #google, OR, Google
                     suc, docList = machingWord (word, globalTrie)
                     for file in docList:
-                        fileNames.append(file.file.name)    #stavlja imena fajlova u listu
+                        fileNames.append(docList[file].file.name)    #stavlja imena fajlova u listu
             elif searchQueryChoosen == 2:
                 suc1,docList1 = machingWord(queryWords[0], globalTrie)
                 suc2,docList2 = machingWord(queryWords[-1], globalTrie)
                 for file in docList1:
-                    fileNames.append(file.file.name)
+                    fileNames.append(docList1[file].file.name)
                 for file in docList2:
-                    fileNames.append(file.file.name)
+                    fileNames.append(docList2[file].file.name)
             elif searchQueryChoosen == 3:
                 pass        #za komplex query
 

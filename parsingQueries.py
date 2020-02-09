@@ -84,18 +84,21 @@ def machingWord(word, globalTrie):
 def simpleSearch(words, globalTrie):
     searchedFiles = []    #sadrzi fajlove i ukupan broj trazenih reci koje sadrze ti fajlovi, treba nam zbog rangiranja
     for word in words:
-        suc, docList = machingWord(word, globalTrie)
+        suc, docMap = machingWord(word, globalTrie)
         if suc:     #rec je nadjena
-            for file in docList:
+            for key in docMap:
                 nalazi = False
                 for f in searchedFiles:
-                    if file.file.name == f.file.name:
-                        f.numberOfWord += file.numberOfWord
+                    if key == f.file.name:
+                        f.numberOfWord += docMap[key].numberOfWord
                         nalazi = True
                         break
                 if not nalazi:
-                    searchedFiles.append(file)
+                    searchedFiles.append(docMap[key])
 
+    print(len(searchedFiles))
+    for i in searchedFiles:
+        print(i)
     return searchedFiles
 
 def logicalSearch(words, globalTrie):

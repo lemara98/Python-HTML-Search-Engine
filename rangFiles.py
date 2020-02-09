@@ -1,3 +1,5 @@
+from time import time
+
 import numpy as np
 import os
 from parsingQueries import machingWord
@@ -6,27 +8,64 @@ from parsingQueries import machingWord
 d = 0.85    #dumping faktor
 
 def findMatrixH(parsiraniFajlovi):
+    print("*****************")
     H = np.eye(len(parsiraniFajlovi))  #ovo mi je H matrica
     H = H * 0   #svi elementi su mi 0 na pocetku
+    vremeEx = 0
+    vremeIs = 0
+    mapaSvihMogucihLinkova = {}
+    for pr in parsiraniFajlovi:
+        mapaSvihMogucihLinkova[pr.name] = pr.name
     for i, file in enumerate(parsiraniFajlovi, start = 0):
+        mapaPotrebnihLinkova = {}
+        #print (file.name, "ima", len (file.links), "linkova")
         for link in file.links:
-            file.mapForH[link] += 1       #broj linkova u svakom fajlu prema ovom fajlu
-        duzinaMape = 0
-        for key in file.mapForH:
-            duzinaMape += 1
-        for j, key in enumerate(file.mapForH, start = 0):
-            H[j, i] = file.mapForH[key]/len(file.links)     #punimo redove od matrice
+            k = False
+            t1 = time ()
+            try:
+                if mapaSvihMogucihLinkova[link] == link:
+                    #print(k, '.', "Link: ", link)
+                    file.mapForH[link] += 1  # broj linkova u svakom fajlu prema ovom fajlu
+                    mapaPotrebnihLinkova[link] = file.mapForH[link]
+                    ti = time()
+            except Exception:
+                k = True
+                te = time ()
 
-        for key in file.mapForH:
+                #print(k, '.', link)                     # potrebno je proci kroz kljuceve mape koji predsatvljaju linkove parsiranih fajl
+                #k+=1
+
+
+            if k:
+                #print("Vreme Exception-a:", te-t1)
+                vremeEx += te-t1
+            if not k:
+                #print ("Vreme bez Exception-a:", ti - t1)
+                vremeIs += ti-t1
+
+        for j, key in enumerate(mapaPotrebnihLinkova, start = 0):
+            H[j, i] = mapaPotrebnihLinkova[key]/len(mapaPotrebnihLinkova)     #punimo redove od matrice
+
+        for key in mapaSvihMogucihLinkova:
             file.mapaPokazivacaNaFajl[key] = []
-        for i, key in enumerate(file.mapForH, start = 0):
-            for j, key2 in enumerate(file.mapForH, start=0):
-                if H[i,j] != 0:
-                    file.mapaPokazivacaNaFajl[key].append(key2)     #dodajem ime u listu
+
+        for j, key2 in enumerate(mapaSvihMogucihLinkova, start=0):
+            if H[i,j] != 0:
+                file.mapaPokazivacaNaFajl[file.name].append(key2)     #dodajem ime u listu
 
     s = 0
+    s1 = 0
+    g = 0
     for i in range(len(H)):
         s += H[i,1]
+        s1 += H[i,2]
+        g += H[1,i]
+    print("range(len(H))", range(len(H)))
+    print ("kolona1=", s)
+    print ("kolona2=", s1)
+    print ("vrsta1=", g)
+    print("Ukupno vreme exception-a:", vremeEx)
+    print ("Ukupno vreme ispravnog-a:", vremeIs)
     return H    #napravili smo matricu
 
 def googleRankForFiles(H):
@@ -54,11 +93,11 @@ def addRangToFile(file, words, globalTrie, parsiraniFajlovi):
 
     vrednostReciUDrugimFajlovima = 0
     for word in words:
-        suc, docList = machingWord(word, globalTrie)
+        suc, docMap = machingWord(word, globalTrie)
         if suc:
-            for doc in docList:
-                if file.file.name in doc.file.links:
-                     vrednostReciUDrugimFajlovima += doc.file.googleRang * doc.numberOfWord * 10     #3. stavka ranga
+            for doc in docMap:
+                if file.file.name in docMap[doc].file.links:
+                     vrednostReciUDrugimFajlovima += docMap[doc].file.googleRang * docMap[doc].numberOfWord * 10     #3. stavka ranga
 
     uticajPokazivaca = 0
     br = 0
