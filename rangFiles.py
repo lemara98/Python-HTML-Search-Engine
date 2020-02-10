@@ -57,18 +57,22 @@ def rangirajFajlovePoGooglu(parsiraniFajlovi):
 
 def RangFiles(searchedFiles, words, globalTrie, parsiraniFajlovi):
     for file in searchedFiles:
-        addRangToFile(file, words, globalTrie, parsiraniFajlovi)
+        addRangToFile(file, words, globalTrie, parsiraniFajlovi, searchedFiles)
 
-def addRangToFile(file, words, globalTrie, parsiraniFajlovi):
+def addRangToFile(file, words, globalTrie, parsiraniFajlovi, searchedFiles):
     brojReciUFajlu = file.numberOfWord  #1. stavka ranga
 
     vrednostReciUDrugimFajlovima = 0
-    for word in words:
-        suc, docMap = machingWord(word, globalTrie)
-        if suc:
-            for doc in docMap:
-                if file.file.name in docMap[doc].file.links:
-                     vrednostReciUDrugimFajlovima += docMap[doc].file.googleRang * docMap[doc].numberOfWord * 10     #3. stavka ranga
+    # for word in words:
+    #     suc, docMap = machingWord(word, globalTrie)
+    #     if suc:
+    #         for doc in docMap:
+    #             if file.file.name in docMap[doc].file.links:
+    #                  vrednostReciUDrugimFajlovima += docMap[doc].file.googleRang * docMap[doc].numberOfWord * 10     #3. stavka ranga
+
+    for f in searchedFiles:
+        if file.file.name in f.file.links:
+             vrednostReciUDrugimFajlovima += f.file.googleRang * f.numberOfWord * 10
 
     uticajPokazivaca = 0
     br = 0
