@@ -160,7 +160,7 @@ def main():
                 searchInput = input("choose option")
                 if searchInput == "1":
                     for file in searchedFiles:
-                        print(file.file.name, file.file.googleRang)
+                        print(file.file.name)
                     badEntry = False
                 elif searchInput == "2":
                     l = len(sortedFiles)
@@ -209,20 +209,8 @@ def main():
                 continue
             G1 = GraphResult()
             fileNames = []      # ime fajlova koji sadrze trazenu rec
-            if searchQueryChoosen == 1:
-                for word in queryWords: #google, OR, Google
-                    suc, docList = machingWord (word, globalTrie)
-                    for file in docList:
-                        fileNames.append(docList[file].file.name)    #stavlja imena fajlova u listu
-            elif searchQueryChoosen == 2:
-                suc1,docList1 = machingWord(queryWords[0], globalTrie)
-                suc2,docList2 = machingWord(queryWords[-1], globalTrie)
-                for file in docList1:
-                    fileNames.append(docList1[file].file.name)
-                for file in docList2:
-                    fileNames.append(docList2[file].file.name)
-            elif searchQueryChoosen == 3:
-                pass        #za komplex query
+            for file in sortedFiles:
+        	    fileNames.append(file.file.name)
 
             for file in sortedFiles:
                 linksForGraph = []  # lista linkova za graf koji pokazuju na fajlove koji sadrze trazenu rec ->fileNames

@@ -1,4 +1,6 @@
 from parglare import Parser, Grammar
+import re
+from TrieStruct import GlobalDocumentList
 
 def simpleQuery(userInput):     #u prostom upitu treba uneti reci razdvojene razmakom, nema puno filozofije
     subStrings = userInput.split(' ')
@@ -16,57 +18,6 @@ def logicalQuery(userInput):
         return None
     print ("--- Uspesno pretrazen upit ---")
     return subStrings       #ako je provera prosla, znaci da je dobar format
-
-def complexQuery(queryInput):    #this should return tree
-    # grammar = r"""
-    #
-    # query
-    # : subQuery
-    # | query opp_type subQuery
-    # ;
-    #
-    # subQuery
-    # : _WORD
-    # | _WORD opp_type _WORD
-    # | _NOT _LPAREN subQuery _RPAREN
-    # ;
-    #
-    # opp_type
-    # : _AND
-    # | _OR
-    # ;
-    #
-    # terminals
-    # _NOT: "!";
-    # _AND: "&&";
-    # _OR: "||";
-    # _LPAREN: "(";
-    # _RPAREN: ")";
-    # _WORD: /[a-zA-Z]+/
-    # """
-    g1 = """
-        S: "2" b? "3"?;
-        
-        terminals
-        b: "1";
-    """
-    g = Grammar.from_string(g1)
-    p = Parser(g, build_tree=True)
-    res = p.parse(queryInput)
-    # parser = Parser(grammar)
-    # result = parser.parse(queryInput, build_tree=True)
-    return res
-
-def findLeaf(tree, node):
-    if len(node.children) != 0:
-        newnode = node.children[0]
-        findLeaf(tree, newnode)
-    return node
-
-# if __name__ == "__main__":
-#     input = input("Query: ")
-#     tree = complexQuery(input)
-#     print(tree.tree_str())
 
 
 def machingWord(word, globalTrie):
@@ -142,3 +93,207 @@ def logicalSearch(words, globalTrie):
 
     return searchedFiles
 
+class BinaryTreeNode:
+    def __init__(self, data):
+        self.pParent = None
+        self.pLeft = None
+        self.pRight = None
+        self.data = data
+
+    def addLeftChild(self, data):
+        newNode = BinaryTreeNode(data)
+        newNode.pParent = self
+        if self.pLeft == None:
+            self.pLeft = newNode
+        else:
+            print("This node already has left child")
+
+    def addRightChild(self, data):
+        newNode = BinaryTreeNode(data)
+        newNode.pParent = self
+        if self.pRight == None:
+            self.pRight = newNode
+        else:
+            print("This node already has right child")
+
+    def isLeaf(self):
+        if self.pLeft == None and self.pRight == None:
+            return True
+        return False
+
+
+class BinaryTree:
+    def __init__(self):
+        self.pRoot = None
+
+    def findRoofForNode(self,node):
+        while node.pParent != None:
+            self.findRoofForNode(node.pParent)
+        return node
+
+    def findMostLeftLeafForNode(self, node):
+        print(node.data)
+        if node.pLeft != None:
+            node = self.findMostLeftLeafForNode(node.pLeft)
+        return node
+
+    def findRightLeafForNode(self, node):
+        pass
+
+    def goOverTree(self):
+        currentNode = self.findMostLeftLeafForNode(self.pRoot)    #pocetka tacka obilaska
+
+
+
+
+def complexQuery(queryInput):    #this should return tree
+    leftSide = ""
+    myTree = BinaryTree()
+    lastNode = None
+    bracketNode = -1
+    nodeAfterBracket = None
+    brojOtvorenihZagrada = 0
+    while len(queryInput) != 0:
+        x = re.search("[a-zA-Z]+|&&|\|\||!|\(|\)", queryInput)      #skeniram string
+        if x.group() == None:
+            print("Wrong input")
+
+        elif x.group() in("&&", "||"):
+            if leftSide == "":
+                print("Error, bad entry")
+            elif leftSide in("!", "||", "(", "&&"):
+                print("Error, bad entry")
+            else:           #sve je u redu, dodajemo ga u drvo
+                newNode = BinaryTreeNode(x.group())
+                if nodeAfterBracket != None:        #znaci da se pojavila zagrada
+                    newNode.pLeft = lastNode
+                    lastNode.pParent = newNode
+                    lastNode = newNode              #sada mi on postaje poslednji
+                else:
+                    if lastNode.pParent != None:
+                        newNode.pParent = lastNode.pParent
+                        if lastNode.pParent.pLeft == lastNode:
+                            lastNode.pParent.pLeft = newNode
+                        else:
+                            lastNode.pParent.pRight = newNode
+                    lastNode.pParent = newNode
+                    newNode.pLeft = lastNode
+                    myTree.pRoot = newNode
+                    lastNode = newNode      #nakon sto smo ubacili node, lastNode postaje taj poslednje ubaceni cvor
+
+        elif x.group() == "(":
+            if leftSide not in("", "&&", "!", "||", "("):
+                print("Error, bad entry")
+            else:       #potrebno je povecati broj otvorenih zagrada
+                if myTree.pRoot == None:
+                    bracketNode = None
+                    lastNode = myTree.pRoot
+                else:
+                    bracketNode = lastNode  #bracket node mi je && ili || na koji posle treba da se uvece podstablo
+                brojOtvorenihZagrada += 1
+
+        elif x.group() == ")":
+            if leftSide == "":
+                print("Error, bad entry")
+            elif leftSide in("(", "&&", "||", "!"):
+                print("Error, bad entry")
+            else:
+                brojOtvorenihZagrada -= 1
+                if brojOtvorenihZagrada == 0:   #ovo je znak da traba da uvezemo podstablo u stablo
+                    roofNode = myTree.findRoofForNode(nodeAfterBracket)
+                    if bracketNode == None:   #znaci da jos nista nema u stablu
+                        myTree.pRoot = roofNode     #roof postaje koren
+                    else:
+                        bracketNode.pRight = roofNode
+                        roofNode.pParent = bracketNode
+                    nodeAfterBracket = None         #sada smo uvezali podstablo u stablo
+                    lastNode = myTree.pRoot
+                else:
+                    lastNode = myTree.findRoofForNode(lastNode)     #sada opeerator u zagradi postaje last node posto imamo jos jednu zagradu
+
+        elif x.group() == "!":
+
+            if leftSide not in("", "(", "&&", "||"):
+                print("Error, bad entry")
+            else:
+                newNode = BinaryTreeNode(x.group())
+                if myTree.pRoot == None and leftSide != "(":
+                    myTree.pRoot = newNode
+                    lastNode = myTree.pRoot
+                else:
+                    if leftSide == "(" and nodeAfterBracket == None:
+                        nodeAfterBracket = newNode
+                    else:   #ispred su ili && ili ||,   uvezujemo ga
+                        lastNode.pRight = newNode
+                        newNode.pParent = lastNode
+                    lastNode = newNode
+
+        else:       #nasli smo rec
+            newNode = BinaryTreeNode(x.group())
+            if myTree.pRoot == None and leftSide != "(":
+                myTree.pRoot = newNode
+                lastNode = myTree.pRoot
+            else:
+                if leftSide in("&&", "||"):
+                    lastNode.pRight = newNode
+                    newNode.pParent = lastNode
+                elif leftSide == "(" and nodeAfterBracket == None:
+                    nodeAfterBracket = newNode
+                elif leftSide == "!":
+                    lastNode.pLeft = newNode
+                    newNode.pParent = lastNode
+                lastNode = newNode
+
+        leftSide = x.group()
+        queryInput = queryInput[x.end():]
+
+
+    if leftSide in ("&&", "!", "||", "("):
+        print("Error, bad entry")       #neuspesno parsiranje
+
+    return myTree
+
+def complexSearch(myTree, node2, globalTree, parsedSet):
+    node = myTree.findMostLeftLeafForNode(node2)  # pocetni cvor
+    sucLeft, leftDocuments = machingWord(node.data, globalTree)  # skup dokumenata iz mape
+    rightDocuments = None
+    returnSkup = []
+    opp = node.pParent
+    if opp == None:
+        return leftDocuments
+    if opp.data == "!":
+        fileSet = set()
+        for doc in leftDocuments:
+            fileSet.add(leftDocuments[doc].file)
+        fileSet = parsedSet - fileSet
+        leftDocuments = []
+        for f in fileSet:
+            newDoc = GlobalDocumentList(f)
+            newDoc.numberOfWord = 0
+            leftDocuments.append(newDoc)
+        return leftDocuments
+    else:
+        if not opp.pRight.isLeaf():
+            print("Rekurzivni poziv")
+            leftDocuments = complexSearch(myTree, opp.pRight, globalTree, parsedSet)
+        sucRight, rightDocuments = machingWord(opp.pRight.data, globalTree)
+        if opp.data == "&&":
+            for file in leftDocuments:
+                for f in rightDocuments:
+                    if leftDocuments[file].file.name == rightDocuments[f].file.name:
+                        leftDocuments[file].numberOfWord += rightDocuments[f].numberOfWord
+                        returnSkup.append(leftDocuments[file])
+                        break
+        else:   #||
+            for file in leftDocuments:
+                returnSkup.append(leftDocuments[file])  # da li je file referenca (orriginal)
+            for file in rightDocuments:
+                nalazi = False
+                for f in returnSkup:
+                    if rightDocuments[file].file.name == f.file.name:
+                        f.numberOfWord += rightDocuments[file].numberOfWord
+                        nalazi = True
+                        break
+                if not nalazi:
+                    returnSkup.append(rightDocuments[file])
+        return returnSkup
