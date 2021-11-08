@@ -30,8 +30,10 @@ class GraphResult:
         nx.draw (self.graf, with_labels=True, node_color=self.colors, node_size=self.node_sizes,
                  edge_color=self.edge_colors)
         # plot.savefig("graph.png")
-        print("Broj cvorova = ", len (self.graf.nodes))
-        print("Broj veza = ", len (self.graf.edges))
+        # print("Broj cvorova = ", len (self.graf.nodes))
+        print("Number of nodes: ", len (self.graf.nodes))
+        # print("Broj veza = ", len (self.graf.edges))
+        print("Number of pointers/connections/relations: ", len (self.graf.edges))
         plot.show ()
 
     def dodajCvorUGraf(self, filename, listaPokazivacaCvora, rangCvora):

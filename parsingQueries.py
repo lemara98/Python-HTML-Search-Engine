@@ -1,4 +1,4 @@
-from parglare import Parser, Grammar
+# from parglare import Parser, Grammar
 import re
 from TrieStruct import GlobalDocumentList
 

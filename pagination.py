@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator
+from paginator import Paginator
 
 def PaginatePages(searchedFiles, N):
     p = Paginator(searchedFiles, N)
