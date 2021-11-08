@@ -242,7 +242,7 @@ def main():
                 print("Do search")
                 continue
             if rangirano == False:
-                print("Rangirajte da biste videli graf")
+                # print("Rangirajte da biste videli graf")
                 print("Rang files first in order to see the result graph")
                 continue
             G1 = GraphResult()
